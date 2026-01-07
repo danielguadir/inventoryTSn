@@ -1,0 +1,80 @@
+@use "../../components/UXLib/styles/variables/colors" as *;
+
+.login-page {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  background: linear-gradient(135deg, var(--color-brand-primary) 0%, var(--color-brand-secondary) 100%);
+  padding: 20px;
+
+  &__card {
+    max-width: 400px;
+    width: 100%;
+    background-color: var(--surface-color);
+    padding: 32px;
+    border-radius: 16px;
+    box-shadow: 0 10px 25px rgba(161, 28, 28, 0.1);
+  }
+
+  &__header {
+    text-align: center;
+    margin-bottom: 32px;
+
+    h1 {
+      font-size: 2rem;
+      color: var(--text-primary);
+      margin-bottom: 8px;
+    }
+
+    p {
+      color: var(--text-secondary);
+      font-size: 0.9rem;
+    }
+  }
+
+  &__form {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+
+    .cmpInputBase-root {
+      border-radius: 4px !important;
+      border: 1px solid rgba(0, 0, 0, 0.1) !important;
+      background-color: #f1f3f4;
+      transition: all 0.3s ease;
+      overflow: hidden;
+
+      &:hover {
+        background-color: #e8eaed;
+      }
+
+      &.cmpInput-underline-focusAF {
+        background-color: #fff;
+        border-color: var(--color-brand-primary) !important;
+        box-shadow: 0 0 0 2px rgba(var(--color-brand-primary-rgb), 0.1);
+      }
+    }
+
+    .cmpInputBase-input {
+      padding: 7px 22px 7px 10px !important;
+      border: none !important;
+      outline: none !important;
+      background: transparent !important;
+    }
+  }
+
+  &__actions {
+    margin-top: 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+
+  &__login-btn {
+    width: 100%;
+    padding: 12px !important;
+    font-weight: 600 !important;
+    font-size: 1rem !important;
+  }
+}

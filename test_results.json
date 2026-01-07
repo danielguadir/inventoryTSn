@@ -1,0 +1,9 @@
+Ôöé
+Ôû▓  No story files found for the specified pattern:
+Ôöé  src\**\*.stories.@(js|jsx|mjs|ts|tsx)
+Warning: Starting in Storybook 8.5.0-alpha.18, the "test.include" option in Vitest is discouraged in favor of just using the "stories" field in your Storybook configuration.
+
+The values you passed to "test.include" will be ignored, please remove them from your Vitest configuration where the Storybook plugin is applied.
+
+More info: https://github.com/storybookjs/storybook/blob/next/MIGRATION.md#addon-test-indexing-behavior-of-storybookaddon-test-is-changed
+{"numTotalTestSuites":1,"numPassedTestSuites":0,"numFailedTestSuites":1,"numPendingTestSuites":0,"numTotalTests":0,"numPassedTests":0,"numFailedTests":0,"numPendingTests":0,"numTodoTests":0,"snapshot":{"added":0,"failure":false,"filesAdded":0,"filesRemoved":0,"filesRemovedList":[],"filesUnmatched":0,"filesUpdated":0,"matched":0,"total":0,"unchecked":0,"uncheckedKeysByFile":[],"unmatched":0,"updated":0,"didUpdate":false},"startTime":1766086242693,"success":false,"testResults":[{"assertionResults":[],"startTime":1766086242693,"endTime":1766086242693,"status":"failed","message":"Failed to resolve import \"react-day-picker\" from \"src/components/UXLib/cmpFields/fields/utilsDate/DaysPicker.tsx\". Does the file exist?","name":"C:/Users/PC/Documents/aplicaciones/FRONTEND/INVENTARIO/INVENTARIO/src/components/UXLib/cmpListSvg/CmpListSvg.test.tsx"}]}
