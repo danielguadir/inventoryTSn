@@ -1,7 +1,12 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
 import { Card } from '../../../components/UXLib/Card/Card';
 import { Table } from '../../../components/UXLib/Table/Table';
 import type { TableColumn } from '../../../components/UXLib/Table/Table.types';
+import { CmpFieldText } from '../../../components/UXLib/cmpFields/fields/CmpFieldText';
+import { CmpFieldSelect } from '../../../components/UXLib/cmpFields/fields/CmpFieldSelect';
+import { fetchInventory } from '../../../api/store/slices/inventorySlice';
+import type { AppDispatch, RootState } from '../../../api/store/store';
 import './EquipmentStand.scss';
 
 // Extend Record<string, any> to satisfy the generic Table<T extends Record<string, unknown>>
@@ -15,17 +20,27 @@ interface Equipment extends Record<string, any> {
     status: 'Available' | 'Assigned' | 'Maintenance';
 }
 
-const MOCK_EQUIPMENT: Equipment[] = [
-    { id: '1', brand: 'Dell', model: 'Latitude 5420', serial: 'DL-5420-001', type: 'Laptop', assignedTo: 'Anna Taylor', status: 'Assigned' },
-    { id: '2', brand: 'HP', model: 'EliteBook 840', serial: 'HP-840-002', type: 'Laptop', assignedTo: null, status: 'Available' },
-    { id: '3', brand: 'Lenovo', model: 'ThinkPad T14', serial: 'LN-T14-003', type: 'Laptop', assignedTo: 'John Doe', status: 'Assigned' },
-    { id: '4', brand: 'LG', model: '27" Ultrafine', serial: 'LG-MON-004', type: 'Monitor', assignedTo: null, status: 'Maintenance' },
-    { id: '5', brand: 'Logitech', model: 'MX Master 3', serial: 'LOG-MSE-005', type: 'Mouse', assignedTo: 'Anna Taylor', status: 'Assigned' },
-];
-
 export const EquipmentStand: React.FC = () => {
+    const dispatch = useDispatch<AppDispatch>();
+    const { items, loading } = useSelector((state: RootState) => state.inventory);
     const [sortKey, setSortKey] = useState<string>('brand');
     const [sortDirection, setSortDirection] = useState<'asc' | 'desc' | null>('asc');
+
+    const [searchTerm, setSearchTerm] = useState('');
+    const [statusFilter, setStatusFilter] = useState('');
+
+    useEffect(() => {
+        dispatch(fetchInventory());
+    }, [dispatch]);
+
+    const filteredItems = items.filter((item: any) => {
+        const matchesSearch =
+            item.serial.toLowerCase().includes(searchTerm.toLowerCase()) ||
+            item.brand.toLowerCase().includes(searchTerm.toLowerCase()) ||
+            item.model.toLowerCase().includes(searchTerm.toLowerCase());
+        const matchesStatus = statusFilter ? item.status === statusFilter : true;
+        return matchesSearch && matchesStatus;
+    });
 
     const columns: TableColumn<Equipment>[] = [
         { key: 'brand', header: 'Brand', sortable: true },
@@ -60,20 +75,44 @@ export const EquipmentStand: React.FC = () => {
         <div className="equipment-stand">
             <header className="equipment-stand__header">
                 <h2>Equipment Stand</h2>
-                <p>This module displays all equipment currently available in the inventory, along with their status.</p>
+                <p>This module displays all equipment currently available in the inventory.</p>
             </header>
 
+            <div style={{ display: 'flex', gap: '1rem', marginBottom: '1rem' }}>
+                <div style={{ flex: 1 }}>
+                    <CmpFieldText
+                        id="search"
+                        label="Search (Serial, Brand, Model)"
+                        value={searchTerm}
+                        onChange={(val) => setSearchTerm(val)}
+                        template="outlined"
+                    />
+                </div>
+                <div style={{ width: '200px' }}>
+                    <CmpFieldSelect
+                        id="statusFilter"
+                        label="Filter by Status"
+                        value={statusFilter}
+                        onChange={(val) => setStatusFilter(val as string)}
+                        template="outlined"
+                        foreignDao={{ '': 'All', 'AVAILABLE': 'Available', 'ASSIGNED': 'Assigned', 'MAINTENANCE': 'Maintenance' }}
+                    />
+                </div>
+            </div>
+
             <Card variant="elevated">
-                <Table
-                    id="equipment-stand-table"
-                    columns={columns}
-                    data={MOCK_EQUIPMENT}
-                    sortKey={sortKey}
-                    sortDirection={sortDirection}
-                    onSortChange={handleSort}
-                    striped
-                    hoverable
-                />
+                {loading ? <p>Loading inventory...</p> : (
+                    <Table
+                        id="equipment-stand-table"
+                        columns={columns}
+                        data={filteredItems}
+                        sortKey={sortKey}
+                        sortDirection={sortDirection}
+                        onSortChange={handleSort}
+                        striped
+                        hoverable
+                    />
+                )}
             </Card>
         </div>
     );

@@ -26,3 +26,11 @@ dist-ssr
 
 *storybook.log
 storybook-static
+
+# Environment and DB
+.env
+*.db
+*.db-journal
+build_errors.txt
+build_errors_summary.txt
+test_results.json

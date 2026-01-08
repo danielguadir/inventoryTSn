@@ -1,5 +1,9 @@
 import React, { useState } from 'react';
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
+import { createRequest, fetchRequests } from '../../../api/store/slices/requestSlice';
+import { fetchInventory } from '../../../api/store/slices/inventorySlice';
+import { fetchCategories } from '../../../api/store/slices/categorySlice';
+import type { AppDispatch, RootState } from '../../../api/store/store';
 import { Card } from '../../../components/UXLib/Card/Card';
 import { CmpFieldText } from '../../../components/UXLib/cmpFields/fields/CmpFieldText';
 import { CmpFieldSelect } from '../../../components/UXLib/cmpFields/fields/CmpFieldSelect';
@@ -13,6 +17,7 @@ const Link: React.FC<{ to: string, style?: any, children: React.ReactNode }> = (
 );
 
 // Constants
+// Constants
 const REQUEST_TYPES = {
     'Monitor': 'Monitor',
     'Computer': 'Computer',
@@ -24,30 +29,30 @@ const REQUEST_TYPES = {
 const MAX_FAILA_LEN = 100;
 
 export const ReportEquipment: React.FC = () => {
-    // Mocking Redux selectors to match the user's JSX structure
-    const user = useSelector((s: any) => s.auth?.currentUserName || 'Daniel Guadir');
-    const lastId = useSelector((s: any) => s.requests?.lastCreatedId);
-    const req = useSelector((s: any) => s.requests?.list?.find((r: any) => r.id === lastId));
+    const dispatch = useDispatch<AppDispatch>();
+    const user = useSelector((state: RootState) => state.auth.user);
+    const { items: inventoryItems } = useSelector((state: RootState) => state.inventory);
+    const { items: requests, loading: submitting } = useSelector((state: RootState) => state.requests);
+    const { items: categories } = useSelector((state: RootState) => state.categories);
 
-    // Inventory items for the "My equipment" selector
-    const inventoryItems = useSelector((s: any) => (s.inventory?.items || []));
-    const confirmedItems = inventoryItems.filter((i: any) => i.assignedTo === user && i.confirmedByUser);
+    // Get latest request for status display
+    const req = requests.length > 0 ? requests[requests.length - 1] : null;
 
-    // Fallback Mock Data for demo if store is empty
-    const demoItems = confirmedItems.length > 0 ? confirmedItems : [
-        { marca: 'Dell', serial: 'LAP-001', assignedTo: 'Daniel Guadir', confirmedByUser: true },
-        { marca: 'HP', serial: 'MON-045', assignedTo: 'Daniel Guadir', confirmedByUser: true }
-    ];
+    // Fetch data on mount
+    React.useEffect(() => {
+        dispatch(fetchInventory());
+        dispatch(fetchCategories());
+        dispatch(fetchRequests());
+    }, [dispatch]);
 
-    // const dispatch = useDispatch();
+    const confirmedItems = inventoryItems.filter((i: any) => i.assignedToUserId === user?.id);
+    const demoItems = confirmedItems; // Use real items
 
-    const [tipo, setTipo] = useState('');
-    const [otroNombre, setOtroNombre] = useState('');
+    const [tipoId, setTipoId] = useState<string>('');
     const [serial, setSerial] = useState('');
     const [falla, setFalla] = useState('');
     const [foto, setFoto] = useState<string | null>(null);
     const [selectedConfirmed, setSelectedConfirmed] = useState('');
-    const [submitting, setSubmitting] = useState(false);
 
     function validateFalla() {
         const text = (falla || '').trim();
@@ -56,20 +61,32 @@ export const ReportEquipment: React.FC = () => {
         return words.length >= 2;
     }
 
-    const onSubmit = (e: React.FormEvent) => {
+    const onSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
 
-        // if no equipment selected manually, require minimum 2 words description
+        if (!tipoId || !falla) return alert('Please fill required fields');
+
         if ((!selectedConfirmed || selectedConfirmed === 'manual') && !validateFalla()) {
-            return alert('Please describe the failure with at least 2 words (max 100 characters)');
+            return alert('Please describe the failure with at least 2 words');
         }
 
-        setSubmitting(true);
-        console.log('Form submission attempted:', { tipo, serial, falla, foto });
+        const requestData = {
+            categoryId: Number(tipoId),
+            description: falla,
+            priority: 'MEDIUM',
+            equipmentId: selectedConfirmed !== 'manual' ? inventoryItems.find(i => `${i.brand} - ${i.serial}` === selectedConfirmed)?.id : null,
+        };
 
-        alert('Functionality temporarily disabled');
-        setSubmitting(false);
-        return;
+        await dispatch(createRequest(requestData));
+        alert('Report submitted successfully');
+    };
+
+    const getCategoryOptions = () => {
+        const options: Record<string, string> = {};
+        categories.forEach((c: any) => {
+            options[c.id.toString()] = c.name;
+        });
+        return options;
     };
 
     const getEquipmentOptions = () => {
@@ -93,27 +110,14 @@ export const ReportEquipment: React.FC = () => {
                     <div className="form-group">
                         <CmpFieldSelect
                             id="tipo"
-                            label="Type"
+                            label="Problem Category"
                             template="outlined"
                             mandatory
-                            value={tipo}
-                            onChange={(val) => setTipo(val as string)}
-                            foreignDao={REQUEST_TYPES}
+                            value={tipoId}
+                            onChange={(val) => setTipoId(val as string)}
+                            foreignDao={getCategoryOptions()}
                         />
                     </div>
-
-                    {tipo === 'Other' ? (
-                        <div className="form-group">
-                            <CmpFieldText
-                                id="otroNombre"
-                                label='"Other" Name'
-                                template="outlined"
-                                mandatory
-                                value={otroNombre}
-                                onChange={(val) => setOtroNombre(val)}
-                            />
-                        </div>
-                    ) : <div className="form-group" />}
 
                     {demoItems.length > 0 && (
                         <div className="form-group full-width">

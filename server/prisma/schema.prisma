@@ -1,0 +1,92 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+// Role enum is handled as String in SQLite
+model User {
+  id        Int      @id @default(autoincrement())
+  name      String
+  email     String   @unique
+  password  String
+  role      String   @default("USER") // USER, ADMIN
+  active    Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  assignments Assignment[]
+  requests    Request[]
+}
+
+model DamageCategory {
+  id        Int       @id @default(autoincrement())
+  name      String    @unique
+  active    Boolean   @default(true)
+  requests  Request[]
+}
+
+model Equipment {
+  id             Int             @id @default(autoincrement())
+  type           String
+  brand          String
+  model          String
+  serial         String          @unique
+  status         String          @default("AVAILABLE") // AVAILABLE, ASSIGNED, MAINTENANCE, DISCHARGED
+  assignedToUserId Int?
+  
+  // Relaciones
+  assignments    Assignment[]
+  requests       Request[]
+  
+  updatedAt      DateTime        @updatedAt
+  createdAt      DateTime        @default(now())
+}
+
+model Request {
+  id              Int           @id @default(autoincrement())
+  userId          Int
+  equipmentId     Int?          // Puede ser reporte general o de un equipo específico
+  categoryId      Int
+  description     String
+  priority        String?       // LOW, MEDIUM, HIGH
+  photoUrl        String?
+  status          String        @default("PENDING") // PENDING, APPROVED, REJECTED, etc.
+  adminComment    String?
+  
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+
+  user            User          @relation(fields: [userId], references: [id])
+  equipment       Equipment?    @relation(fields: [equipmentId], references: [id])
+  category        DamageCategory @relation(fields: [categoryId], references: [id])
+  actas           Acta[]
+}
+
+model Assignment {
+  id          Int      @id @default(autoincrement())
+  equipmentId Int
+  userId      Int
+  assignedBy  Int?     // Admin ID
+  assignedAt  DateTime @default(now())
+  returnedAt  DateTime? // Si ya se devolvió
+
+  equipment   Equipment @relation(fields: [equipmentId], references: [id])
+  user        User      @relation(fields: [userId], references: [id])
+  actas       Acta[]
+}
+
+model Acta {
+  id           Int      @id @default(autoincrement())
+  type         String   // ENTREGA, MANTENIMIENTO, SOLICITUD
+  requestId    Int?
+  assignmentId Int?
+  pdfUrl       String
+  generatedAt  DateTime @default(now())
+
+  request      Request?    @relation(fields: [requestId], references: [id])
+  assignment   Assignment? @relation(fields: [assignmentId], references: [id])
+}

@@ -1,16 +1,17 @@
-import { useState } from 'react';
+import { useSelector } from 'react-redux';
 import { LoginPage } from './modules/Auth/LoginPage';
 import { MainLayout } from './modules/Layout/MainLayout';
+import type { RootState } from './api/store/store';
 
 const App = () => {
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const token = useSelector((state: RootState) => state.auth.token);
 
   return (
     <>
-      {isLoggedIn ? (
+      {token ? (
         <MainLayout />
       ) : (
-        <LoginPage onLogin={() => setIsLoggedIn(true)} />
+        <LoginPage />
       )}
     </>
   );

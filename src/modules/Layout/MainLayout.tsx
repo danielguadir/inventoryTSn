@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
+import { useSelector } from 'react-redux';
 import { Menu } from '../../components/UXLib/Menu/Menu';
 import type { MenuItem } from '../../components/UXLib/Menu/Menu.types';
+import type { RootState } from '../../api/store/store';
 import './MainLayout.scss';
 import { ReportEquipment } from '../Tickets/ReportEquipment/ReportEquipment';
 import { EquipmentStand } from '../Inventory/EquipmentStand/EquipmentStand';
@@ -89,6 +91,12 @@ export const MainLayout: React.FC = () => {
                     onClick: () => setActiveTab('admin-requests')
                 },
                 {
+                    id: 'admin-categories',
+                    label: 'Categories',
+                    active: activeTab === 'admin-categories',
+                    onClick: () => setActiveTab('admin-categories')
+                },
+                {
                     id: 'admin-notifications',
                     label: 'Notifications',
                     active: activeTab === 'admin-notifications',
@@ -144,6 +152,13 @@ export const MainLayout: React.FC = () => {
         }
     };
 
+    const user = useSelector((state: RootState) => state.auth.user);
+    const userRole = user?.role;
+
+    const filteredSecondaryItems = secondaryItems.filter(item =>
+        item.id !== 'admin' || userRole === 'ADMIN'
+    );
+
     return (
         <div className="main-layout">
             <Menu
@@ -151,10 +166,10 @@ export const MainLayout: React.FC = () => {
                 onToggleExpand={setExpanded}
                 brandName="Inventory"
                 items={menuItems}
-                secondaryItems={secondaryItems}
+                secondaryItems={filteredSecondaryItems}
                 user={{
-                    name: 'Anna Taylor',
-                    email: 'anna.taylor@example.com',
+                    name: user?.name || 'Guest',
+                    email: user?.email || '',
                     avatar: '',
                 }}
             />

@@ -1,4 +1,5 @@
 import { createSlice } from '@reduxjs/toolkit'
+import api from '../../axios';
 import type { PayloadAction } from '@reduxjs/toolkit'
 
 interface Product {

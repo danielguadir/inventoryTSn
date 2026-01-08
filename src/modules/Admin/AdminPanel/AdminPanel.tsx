@@ -1,6 +1,10 @@
 import React from 'react';
 import { Card } from '../../../components/UXLib/Card/Card';
 import './AdminPanel.scss';
+import { AdminUsers } from './components/AdminUsers';
+import { AdminInventory } from './components/AdminInventory';
+import { AdminRequests } from './components/AdminRequests';
+import { AdminCategories } from './components/AdminCategories';
 
 interface AdminPanelProps {
     activeSubTab: string;
@@ -26,12 +30,24 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ activeSubTab }) => {
             </header>
 
             <Card variant="elevated">
-                <div className="admin-panel__placeholder">
-                    <h3>{getSubTabLabel(activeSubTab)}</h3>
-                    <div className="admin-panel__empty-state">
-                        <p>This module is currently under development.</p>
-                        <p>Soon you will be able to manage <strong>{getSubTabLabel(activeSubTab).toLowerCase()}</strong> from this section.</p>
-                    </div>
+                <div className="admin-panel__content">
+                    {/* {getSubTabLabel(activeSubTab)} */}
+                    {activeSubTab === 'admin-users' && <AdminUsers />}
+                    {activeSubTab === 'admin-inventory' && <AdminInventory />}
+                    {activeSubTab === 'admin-requests' && <AdminRequests />}
+                    {activeSubTab === 'admin-categories' && <AdminCategories />}
+                    {activeSubTab === 'admin-notifications' && (
+                        <div className="admin-panel__empty-state">
+                            <p>System Notifications module coming soon.</p>
+                        </div>
+                    )}
+                    {/* Default view or Dashboard could go here */}
+                    {!['admin-users', 'admin-inventory', 'admin-requests', 'admin-notifications'].includes(activeSubTab) && (
+                        <div className="admin-panel__dashboard">
+                            <h3>Admin Dashboard</h3>
+                            <p>Select a module from the sidebar to manage the system.</p>
+                        </div>
+                    )}
                 </div>
             </Card>
         </div>
