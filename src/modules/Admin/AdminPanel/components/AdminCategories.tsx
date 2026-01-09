@@ -27,22 +27,22 @@ export const AdminCategories: React.FC = () => {
 
     const columns: TableColumn<any>[] = [
         { key: 'id', header: 'ID', sortable: true },
-        { key: 'name', header: 'Category Name', sortable: true },
-        { key: 'active', header: 'Active', render: (val: boolean) => val ? 'Yes' : 'No' },
+        { key: 'name', header: 'Infrastructure Item', sortable: true },
+        { key: 'active', header: 'Active', render: (val: any) => val ? 'Yes' : 'No' },
     ];
 
     return (
-        <div className="admin-categories">
+        <div className="admin-infrastructure">
             <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '1rem' }}>
-                <h3>Damage Categories</h3>
-                <Button nameBtn="Add Category" variant="contained" onClick={() => setIsModalOpen(true)} />
+                <h3>Infrastructure Management</h3>
+                <Button nameBtn="Add Infrastructure" variant="contained" onClick={() => setIsModalOpen(true)} />
             </div>
 
-            <Table id="categories-table" columns={columns} data={items} striped />
+            <Table id="infrastructure-table" columns={columns} data={items} striped />
 
-            <Modal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} title="Add Category" onConfirm={handleCreate}>
+            <Modal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} title="Add Infrastructure" onConfirm={handleCreate}>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-                    <CmpFieldText id="cat-name" label="Category Name" value={name} onChange={setName} mandatory template="outlined" />
+                    <CmpFieldText id="infra-name" label="Infrastructure Name" value={name} onChange={setName} mandatory template="outlined" />
                 </div>
             </Modal>
         </div>

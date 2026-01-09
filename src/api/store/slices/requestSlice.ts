@@ -7,7 +7,9 @@ interface RequestItem {
     status: string;
     createdAt: string;
     equipment?: any;
-    category?: any;
+    infrastructure?: any;
+    userId?: number;
+    userName?: string;
 }
 
 interface RequestState {
@@ -40,6 +42,15 @@ export const createRequest = createAsyncThunk('requests/create', async (data: an
     }
 });
 
+export const updateRequestStatus = createAsyncThunk('requests/updateStatus', async ({ id, status, adminComment }: { id: number, status: string, adminComment?: string }, { rejectWithValue }) => {
+    try {
+        const response = await api.put(`/requests/${id}/status`, { status, adminComment });
+        return response.data;
+    } catch (error: any) {
+        return rejectWithValue(error.response?.data?.message || 'Failed to update request status');
+    }
+});
+
 const requestSlice = createSlice({
     name: 'requests',
     initialState,
@@ -63,15 +74,6 @@ const requestSlice = createSlice({
                 }
             });
     },
-});
-
-export const updateRequestStatus = createAsyncThunk('requests/updateStatus', async ({ id, status, adminComment }: { id: number, status: string, adminComment?: string }, { rejectWithValue }) => {
-    try {
-        const response = await api.put(`/requests/${id}/status`, { status, adminComment });
-        return response.data;
-    } catch (error: any) {
-        return rejectWithValue(error.response?.data?.message || 'Failed to update request status');
-    }
 });
 
 export default requestSlice.reducer;

@@ -91,10 +91,10 @@ export const MainLayout: React.FC = () => {
                     onClick: () => setActiveTab('admin-requests')
                 },
                 {
-                    id: 'admin-categories',
-                    label: 'Categories',
-                    active: activeTab === 'admin-categories',
-                    onClick: () => setActiveTab('admin-categories')
+                    id: 'admin-infrastructure',
+                    label: 'Infraestructura',
+                    active: activeTab === 'admin-infrastructure',
+                    onClick: () => setActiveTab('admin-infrastructure')
                 },
                 {
                     id: 'admin-notifications',
@@ -137,6 +137,7 @@ export const MainLayout: React.FC = () => {
             case 'admin-users':
             case 'admin-inventory':
             case 'admin-requests':
+            case 'admin-infrastructure':
             case 'admin-notifications':
                 return <AdminPanel activeSubTab={activeTab} />;
             default:

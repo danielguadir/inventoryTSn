@@ -31,12 +31,17 @@ const MAX_FAILA_LEN = 100;
 export const ReportEquipment: React.FC = () => {
     const dispatch = useDispatch<AppDispatch>();
     const user = useSelector((state: RootState) => state.auth.user);
-    const { items: inventoryItems } = useSelector((state: RootState) => state.inventory);
-    const { items: requests, loading: submitting } = useSelector((state: RootState) => state.requests);
-    const { items: categories } = useSelector((state: RootState) => state.categories);
+    const inventoryState = useSelector((state: RootState) => state.inventory);
+    const requestsState = useSelector((state: RootState) => state.requests);
+    const categoriesState = useSelector((state: RootState) => state.categories);
+
+    const inventoryItems = inventoryState?.items ?? [];
+    const requests = requestsState?.items ?? [];
+    const categories = categoriesState?.items ?? [];
+    const submitting = requestsState?.loading ?? false;
 
     // Get latest request for status display
-    const req = requests.length > 0 ? requests[requests.length - 1] : null;
+    const req = (requests && requests.length > 0) ? requests[requests.length - 1] : null;
 
     // Fetch data on mount
     React.useEffect(() => {
@@ -45,7 +50,7 @@ export const ReportEquipment: React.FC = () => {
         dispatch(fetchRequests());
     }, [dispatch]);
 
-    const confirmedItems = inventoryItems.filter((i: any) => i.assignedToUserId === user?.id);
+    const confirmedItems = (inventoryItems || []).filter((i: any) => i.assignedToUserId === user?.id);
     const demoItems = confirmedItems; // Use real items
 
     const [tipoId, setTipoId] = useState<string>('');
@@ -71,7 +76,7 @@ export const ReportEquipment: React.FC = () => {
         }
 
         const requestData = {
-            categoryId: Number(tipoId),
+            infrastructureId: Number(tipoId),
             description: falla,
             priority: 'MEDIUM',
             equipmentId: selectedConfirmed !== 'manual' ? inventoryItems.find(i => `${i.brand} - ${i.serial}` === selectedConfirmed)?.id : null,
@@ -82,7 +87,7 @@ export const ReportEquipment: React.FC = () => {
     };
 
     const getCategoryOptions = () => {
-        const options: Record<string, string> = {};
+        const options: Record<string, string> = { '': 'Select category' }; // Agregando opción por defecto
         categories.forEach((c: any) => {
             options[c.id.toString()] = c.name;
         });
@@ -103,7 +108,7 @@ export const ReportEquipment: React.FC = () => {
         <div className="report-equipment">
             <Card
                 title="Report Equipment"
-                subtitle={`User: ${user}`}
+                subtitle={`User: ${user?.name || 'Guest'}`}
                 variant="elevated"
             >
                 <form onSubmit={onSubmit} className="report-form">
@@ -193,7 +198,7 @@ export const ReportEquipment: React.FC = () => {
                             disabled={submitting}
                         />
 
-                        {req && req.userName === user && (
+                        {req && req.userId === user?.id && (
                             <div className="report-status">
                                 {req.status === 'approved' ? (
                                     <Link to="/app/mis" style={{ color: '#06c', textDecoration: 'underline' }}>

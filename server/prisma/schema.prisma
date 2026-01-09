@@ -22,7 +22,7 @@ model User {
   requests    Request[]
 }
 
-model DamageCategory {
+model Infrastructure {
   id        Int       @id @default(autoincrement())
   name      String    @unique
   active    Boolean   @default(true)
@@ -50,7 +50,7 @@ model Request {
   id              Int           @id @default(autoincrement())
   userId          Int
   equipmentId     Int?          // Puede ser reporte general o de un equipo específico
-  categoryId      Int
+  infrastructureId Int
   description     String
   priority        String?       // LOW, MEDIUM, HIGH
   photoUrl        String?
@@ -59,10 +59,10 @@ model Request {
   
   createdAt       DateTime      @default(now())
   updatedAt       DateTime      @updatedAt
-
+ 
   user            User          @relation(fields: [userId], references: [id])
   equipment       Equipment?    @relation(fields: [equipmentId], references: [id])
-  category        DamageCategory @relation(fields: [categoryId], references: [id])
+  infrastructure  Infrastructure @relation(fields: [infrastructureId], references: [id])
   actas           Acta[]
 }
 

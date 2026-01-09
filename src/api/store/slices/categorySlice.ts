@@ -21,7 +21,7 @@ const initialState: CategoryState = {
 
 export const fetchCategories = createAsyncThunk('categories/fetchAll', async (_, { rejectWithValue }) => {
     try {
-        const response = await api.get('/categories');
+        const response = await api.get('/infrastructure');
         return response.data;
     } catch (error: any) {
         return rejectWithValue(error.response?.data?.message || 'Failed to fetch categories');
@@ -30,7 +30,7 @@ export const fetchCategories = createAsyncThunk('categories/fetchAll', async (_,
 
 export const createCategory = createAsyncThunk('categories/create', async (name: string, { rejectWithValue }) => {
     try {
-        const response = await api.post('/categories', { name });
+        const response = await api.post('/infrastructure', { name });
         return response.data;
     } catch (error: any) {
         return rejectWithValue(error.response?.data?.message || 'Failed to create category');

@@ -9,12 +9,12 @@ export const getRequests = async (req: Request, res: Response) => {
         let requests;
         if (role === 'ADMIN') {
             requests = await prisma.request.findMany({
-                include: { user: true, equipment: true, category: true },
+                include: { user: true, equipment: true, infrastructure: true },
             });
         } else {
             requests = await prisma.request.findMany({
                 where: { userId },
-                include: { equipment: true, category: true },
+                include: { equipment: true, infrastructure: true },
             });
         }
         res.json(requests);
@@ -25,7 +25,7 @@ export const getRequests = async (req: Request, res: Response) => {
 
 export const createRequest = async (req: Request, res: Response) => {
     try {
-        const { equipmentId, categoryId, description, priority } = req.body;
+        const { equipmentId, infrastructureId, description, priority } = req.body;
         const userId = req.user?.id;
 
         if (!userId) { // Should be caught by middleware but for safety
@@ -37,7 +37,7 @@ export const createRequest = async (req: Request, res: Response) => {
             data: {
                 userId,
                 equipmentId,
-                categoryId,
+                infrastructureId,
                 description,
                 priority,
                 status: 'PENDING',

@@ -5,6 +5,7 @@ export interface SubMenuItem {
   label: string;
   onClick?: () => void;
   active?: boolean;
+  subItems?: SubMenuItem[];
 }
 
 export interface MenuItem {

@@ -32,40 +32,6 @@ export const fetchInventory = createAsyncThunk('inventory/fetchAll', async (_, {
     }
 });
 
-const inventorySlice = createSlice({
-    name: 'inventory',
-    initialState,
-    reducers: {},
-    extraReducers: (builder) => {
-        builder
-            .addCase(fetchInventory.pending, (state) => {
-                state.loading = true;
-            })
-            .addCase(fetchInventory.fulfilled, (state, action) => {
-                state.loading = false;
-                state.items = action.payload;
-            })
-            .addCase(fetchInventory.rejected, (state, action) => {
-                state.loading = false;
-                state.error = action.payload as string;
-            })
-            .addCase(createEquipment.fulfilled, (state, action) => {
-                state.items.push(action.payload);
-            })
-            .addCase(updateEquipment.fulfilled, (state, action) => {
-                const index = state.items.findIndex(i => i.id === action.payload.id);
-                if (index !== -1) state.items[index] = action.payload;
-            })
-            .addCase(assignEquipment.fulfilled, (state, action) => {
-                const index = state.items.findIndex(i => i.id === action.payload.id);
-                if (index !== -1) state.items[index] = action.payload;
-            })
-            .addCase(deleteEquipment.fulfilled, (state, action) => {
-                state.items = state.items.filter(i => i.id !== action.payload);
-            });
-    },
-});
-
 export const createEquipment = createAsyncThunk('inventory/create', async (data: any, { rejectWithValue }) => {
     try {
         const response = await api.post('/equipment', data);
@@ -100,6 +66,40 @@ export const assignEquipment = createAsyncThunk('inventory/assign', async ({ id,
     } catch (error: any) {
         return rejectWithValue(error.response?.data?.message || 'Failed to assign equipment');
     }
+});
+
+const inventorySlice = createSlice({
+    name: 'inventory',
+    initialState,
+    reducers: {},
+    extraReducers: (builder) => {
+        builder
+            .addCase(fetchInventory.pending, (state) => {
+                state.loading = true;
+            })
+            .addCase(fetchInventory.fulfilled, (state, action) => {
+                state.loading = false;
+                state.items = action.payload;
+            })
+            .addCase(fetchInventory.rejected, (state, action) => {
+                state.loading = false;
+                state.error = action.payload as string;
+            })
+            .addCase(createEquipment.fulfilled, (state, action) => {
+                state.items.push(action.payload);
+            })
+            .addCase(updateEquipment.fulfilled, (state, action) => {
+                const index = state.items.findIndex(i => i.id === action.payload.id);
+                if (index !== -1) state.items[index] = action.payload;
+            })
+            .addCase(assignEquipment.fulfilled, (state, action) => {
+                const index = state.items.findIndex(i => i.id === action.payload.id);
+                if (index !== -1) state.items[index] = action.payload;
+            })
+            .addCase(deleteEquipment.fulfilled, (state, action) => {
+                state.items = state.items.filter(i => i.id !== action.payload);
+            });
+    },
 });
 
 export default inventorySlice.reducer;

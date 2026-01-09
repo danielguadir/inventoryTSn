@@ -20,7 +20,10 @@ async function main() {
 
     console.log('Default admin created:', admin.email);
 
-    const categories = [
+    const infrastructure = [
+        'Aire',
+        'Planta',
+        'UPS',
         'Monitor/Screen',
         'Keyboard/Mouse',
         'Software/OS',
@@ -29,15 +32,15 @@ async function main() {
         'Other'
     ];
 
-    for (const name of categories) {
-        await prisma.damageCategory.upsert({
+    for (const name of infrastructure) {
+        await prisma.infrastructure.upsert({
             where: { name },
             update: {},
             create: { name },
         });
     }
 
-    console.log('Basic damage categories created');
+    console.log('Infrastructure categories created');
 }
 
 main()

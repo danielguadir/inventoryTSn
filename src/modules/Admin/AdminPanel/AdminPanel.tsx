@@ -16,7 +16,7 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ activeSubTab }) => {
         switch (id) {
             case 'admin-users': return 'Users Management';
             case 'admin-inventory': return 'Inventory Administration';
-            case 'admin-requests': return 'Service Requests Control';
+            case 'admin-infrastructure': return 'Infrastructure Management';
             case 'admin-notifications': return 'System Notifications';
             default: return 'Admin Overview';
         }
@@ -35,7 +35,7 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ activeSubTab }) => {
                     {activeSubTab === 'admin-users' && <AdminUsers />}
                     {activeSubTab === 'admin-inventory' && <AdminInventory />}
                     {activeSubTab === 'admin-requests' && <AdminRequests />}
-                    {activeSubTab === 'admin-categories' && <AdminCategories />}
+                    {activeSubTab === 'admin-infrastructure' && <AdminCategories />}
                     {activeSubTab === 'admin-notifications' && (
                         <div className="admin-panel__empty-state">
                             <p>System Notifications module coming soon.</p>
