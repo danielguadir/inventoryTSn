@@ -1,4 +1,5 @@
 import React from 'react';
+import { useParams } from 'react-router-dom';
 import { Card } from '../../../components/UXLib/Card/Card';
 import './AdminPanel.scss';
 import { AdminUsers } from './components/AdminUsers';
@@ -6,11 +7,10 @@ import { AdminInventory } from './components/AdminInventory';
 import { AdminRequests } from './components/AdminRequests';
 import { AdminCategories } from './components/AdminCategories';
 
-interface AdminPanelProps {
-    activeSubTab: string;
-}
+export const AdminPanel: React.FC = () => {
+    const { section } = useParams<{ section: string }>();
+    const activeSubTab = `admin-${section || 'users'}`;
 
-export const AdminPanel: React.FC<AdminPanelProps> = ({ activeSubTab }) => {
     // Determine the label based on the sub-tab ID
     const getSubTabLabel = (id: string) => {
         switch (id) {
@@ -42,7 +42,7 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ activeSubTab }) => {
                         </div>
                     )}
                     {/* Default view or Dashboard could go here */}
-                    {!['admin-users', 'admin-inventory', 'admin-requests', 'admin-notifications'].includes(activeSubTab) && (
+                    {!['admin-users', 'admin-inventory', 'admin-requests', 'admin-notifications', 'admin-infrastructure'].includes(activeSubTab) && (
                         <div className="admin-panel__dashboard">
                             <h3>Admin Dashboard</h3>
                             <p>Select a module from the sidebar to manage the system.</p>

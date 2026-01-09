@@ -1,18 +1,29 @@
 import React, { useState } from 'react';
 import { useSelector } from 'react-redux';
+import { Outlet, useNavigate, useLocation } from 'react-router-dom';
 import { Menu } from '../../components/UXLib/Menu/Menu';
 import type { MenuItem } from '../../components/UXLib/Menu/Menu.types';
 import type { RootState } from '../../api/store/store';
+import { UserProfile } from './components/UserProfile';
 import './MainLayout.scss';
-import { ReportEquipment } from '../Tickets/ReportEquipment/ReportEquipment';
-import { EquipmentStand } from '../Inventory/EquipmentStand/EquipmentStand';
-import { MyRequests } from '../Tickets/MyRequests/MyRequests';
-import { MyEquipment } from '../Inventory/MyEquipment/MyEquipment';
-import { AdminPanel } from '../Admin/AdminPanel/AdminPanel';
 
 export const MainLayout: React.FC = () => {
     const [expanded, setExpanded] = useState(true);
-    const [activeTab, setActiveTab] = useState('report');
+    const navigate = useNavigate();
+    const location = useLocation();
+
+    // Determine active tab from URL
+    const getActiveTab = () => {
+        const path = location.pathname;
+        if (path.includes('/app/report')) return 'report';
+        if (path.includes('/app/stand')) return 'stand';
+        if (path.includes('/app/requests')) return 'requests';
+        if (path.includes('/app/equipment')) return 'equipment';
+        if (path.includes('/app/admin')) return 'admin';
+        return 'report';
+    };
+
+    const activeTab = getActiveTab();
 
     const menuItems: MenuItem[] = [
         {
@@ -20,48 +31,48 @@ export const MainLayout: React.FC = () => {
             label: 'Report Equipment',
             icon: 'pencil',
             active: activeTab === 'report',
-            onClick: () => setActiveTab('report'),
+            onClick: () => navigate('/app/report'),
         },
         {
             id: 'stand',
             label: 'Equipment Stand',
             icon: 'th-list',
-            active: activeTab === 'stand' || activeTab.startsWith('stand-'),
+            active: activeTab === 'stand',
             subItems: [
                 {
                     id: 'stand-computing',
                     label: 'Computing Equipment',
-                    active: activeTab === 'stand-computing',
-                    onClick: () => setActiveTab('stand-computing')
+                    active: location.pathname === '/app/stand/computing',
+                    onClick: () => navigate('/app/stand/computing')
                 },
                 {
                     id: 'stand-accessories',
                     label: 'Accessories',
-                    active: activeTab === 'stand-accessories',
-                    onClick: () => setActiveTab('stand-accessories')
+                    active: location.pathname === '/app/stand/accessories',
+                    onClick: () => navigate('/app/stand/accessories')
                 },
                 {
                     id: 'stand-network',
                     label: 'Network',
-                    active: activeTab === 'stand-network',
-                    onClick: () => setActiveTab('stand-network')
+                    active: location.pathname === '/app/stand/network',
+                    onClick: () => navigate('/app/stand/network')
                 },
             ],
-            onClick: () => setActiveTab('stand'),
+            onClick: () => navigate('/app/stand'),
         },
         {
             id: 'requests',
             label: 'My Requests',
             icon: 'form',
             active: activeTab === 'requests',
-            onClick: () => setActiveTab('requests'),
+            onClick: () => navigate('/app/requests'),
         },
         {
             id: 'equipment',
             label: 'My Equipment',
             icon: 'home',
             active: activeTab === 'equipment',
-            onClick: () => setActiveTab('equipment'),
+            onClick: () => navigate('/app/equipment'),
         },
     ];
 
@@ -70,88 +81,42 @@ export const MainLayout: React.FC = () => {
             id: 'admin',
             label: 'Admin Panel',
             icon: 'cog',
-            active: activeTab === 'admin' || activeTab.startsWith('admin-'),
+            active: activeTab === 'admin',
             subItems: [
                 {
                     id: 'admin-users',
                     label: 'Users',
-                    active: activeTab === 'admin-users',
-                    onClick: () => setActiveTab('admin-users')
+                    active: location.pathname === '/app/admin/users',
+                    onClick: () => navigate('/app/admin/users')
                 },
                 {
                     id: 'admin-inventory',
                     label: 'Inventory',
-                    active: activeTab === 'admin-inventory',
-                    onClick: () => setActiveTab('admin-inventory')
+                    active: location.pathname === '/app/admin/inventory',
+                    onClick: () => navigate('/app/admin/inventory')
                 },
                 {
                     id: 'admin-requests',
                     label: 'Requests',
-                    active: activeTab === 'admin-requests',
-                    onClick: () => setActiveTab('admin-requests')
+                    active: location.pathname === '/app/admin/requests',
+                    onClick: () => navigate('/app/admin/requests')
                 },
                 {
                     id: 'admin-infrastructure',
                     label: 'Infraestructura',
-                    active: activeTab === 'admin-infrastructure',
-                    onClick: () => setActiveTab('admin-infrastructure')
+                    active: location.pathname === '/app/admin/infrastructure',
+                    onClick: () => navigate('/app/admin/infrastructure')
                 },
                 {
                     id: 'admin-notifications',
                     label: 'Notifications',
-                    active: activeTab === 'admin-notifications',
-                    onClick: () => setActiveTab('admin-notifications')
+                    active: location.pathname === '/app/admin/notifications',
+                    onClick: () => navigate('/app/admin/notifications')
                 },
             ],
-            onClick: () => setActiveTab('admin'),
+            onClick: () => navigate('/app/admin/users'),
         },
     ];
-
-    const findLabel = (items: MenuItem[], id: string): string | undefined => {
-        for (const item of items) {
-            if (item.id === id) return item.label as string;
-            if (item.subItems) {
-                const subItem = item.subItems.find(sub => sub.id === id);
-                if (subItem) return subItem.label;
-            }
-        }
-        return undefined;
-    };
-
-    const currentLabel = findLabel([...menuItems, ...secondaryItems], activeTab) || 'Content';
-
-    const renderContent = () => {
-        switch (activeTab) {
-            case 'report':
-                return <ReportEquipment />;
-            case 'stand':
-            case 'stand-computing':
-            case 'stand-accessories':
-            case 'stand-network':
-                return <EquipmentStand />;
-            case 'requests':
-                return <MyRequests />;
-            case 'equipment':
-                return <MyEquipment />;
-            case 'admin':
-            case 'admin-users':
-            case 'admin-inventory':
-            case 'admin-requests':
-            case 'admin-infrastructure':
-            case 'admin-notifications':
-                return <AdminPanel activeSubTab={activeTab} />;
-            default:
-                return (
-                    <>
-                        <h1>{currentLabel}</h1>
-                        <div className="main-layout__page-content">
-                            <p>This is the content area for <strong>{currentLabel}</strong>.</p>
-                            <p>Development of this module will follow in subsequent stages.</p>
-                        </div>
-                    </>
-                );
-        }
-    };
 
     const user = useSelector((state: RootState) => state.auth.user);
     const userRole = user?.role;
@@ -168,15 +133,17 @@ export const MainLayout: React.FC = () => {
                 brandName="Inventory"
                 items={menuItems}
                 secondaryItems={filteredSecondaryItems}
-                user={{
-                    name: user?.name || 'Guest',
-                    email: user?.email || '',
-                    avatar: '',
-                }}
             />
-            <main className="main-layout__content">
-                {renderContent()}
-            </main>
+            <div className="main-layout__container">
+                <header className="main-layout__header">
+                    <div className="main-layout__header-content">
+                        <UserProfile />
+                    </div>
+                </header>
+                <main className="main-layout__content">
+                    <Outlet />
+                </main>
+            </div>
         </div>
     );
 };
